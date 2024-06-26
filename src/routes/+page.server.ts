@@ -1,6 +1,7 @@
-import { env } from '$env/dynamic/private';
+import * as env from '$env/static/private';
 export const prerender = true;
 
 export function load() {
-	return { url: env.VERCEL_PROJECT_PRODUCTION_URL ?? '' };
+	// @ts-expect-error: ignore for local
+	return { url: env?.VERCEL_PROJECT_PRODUCTION_URL ?? '' };
 }
