@@ -22,7 +22,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="og:image" content={`${data.url ?? ''}/bratify.png`} />
+	<meta property="og:image" content={`https://${data.url ?? ''}/bratify.png`} />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
@@ -33,7 +33,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="twitter:image" content={`${data.url ?? ''}/bratify.png`} />
+	<meta property="twitter:image" content={`https://${data.url ?? ''}/bratify.png`} />
 </svelte:head>
 
 <section>
