@@ -1,0 +1,14 @@
+body {
+	min-height: 100vh;
+	margin: 0;
+	font-size: 18px;
+}
+
+* {
+	font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+input[type='checkbox'] {
+	width: 2rem;
+	height: 2rem;
+}
