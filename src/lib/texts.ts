@@ -24,5 +24,5 @@ export const texts = [
 	'The girl, so confusing version with lorde',
 	'The 360 remix with robyn and yung lean',
 	'The von dutch remix with skream and benga',
-    'The von dutch remix with addison rae and a.g. cook'
+	'The von dutch remix with addison rae and a.g. cook'
 ];
