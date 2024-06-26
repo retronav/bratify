@@ -1,5 +1,7 @@
 <script>
 	import Generator from './Generator.svelte';
+	// @ts-ignore
+	import { VERCEL_PROJECT_PRODUCTION_URL } from '$env/dynamic/private';
 </script>
 
 <svelte:head>
@@ -19,7 +21,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="og:image" content="/bratify.png" />
+	<meta property="og:image" content={VERCEL_PROJECT_PRODUCTION_URL ?? '' + '/bratify.png'} />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
@@ -30,7 +32,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="twitter:image" content="/bratify.png" />
+	<meta property="twitter:image" content={VERCEL_PROJECT_PRODUCTION_URL ?? '' + '/bratify.png'} />
 </svelte:head>
 
 <section>
