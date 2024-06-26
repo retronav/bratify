@@ -11,8 +11,6 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@fontsource/fira-mono": "^4.5.10",
-		"@neoconfetti/svelte": "^1.0.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-vercel": "^5.3.2",
 		"@sveltejs/kit": "^2.0.0",

@@ -81,7 +81,7 @@
 </section>
 
 <section class="export">
-	<button on:click={exportArt}>export</button>
+	<button data-umami-event="Export" on:click={exportArt}>export</button>
 </section>
 
 <style>
@@ -102,6 +102,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		text-align: center;
 	}
 	.album-art:focus {
 		outline: none;

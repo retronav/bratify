@@ -1,3 +1,8 @@
+@font-face {
+	font-family: arialnarrow;
+	src: url("../lib/fonts/arial-narrow.woff");
+}
+
 body {
 	min-height: 100vh;
 	margin: 0;
@@ -5,7 +10,7 @@ body {
 }
 
 * {
-	font-family: 'Arial Narrow', Arial, sans-serif;
+	font-family: arialnarrow, 'Arial Narrow', Arial, sans-serif;
 }
 
 input[type='checkbox'] {
