@@ -19,7 +19,28 @@
 
 	let albumArt!: HTMLDivElement;
 
+	function moveCursorToEnd(element: HTMLElement) {
+		const sel = window.getSelection();
+		if (sel) {
+			sel.selectAllChildren(element);
+			sel.collapseToEnd();
+		}
+	}
+
 	function resizeText() {
+		// Weird edge case where if center mode is selected and user removes all
+		// existing text, the new entered text is not resized. Move it to
+		// textFit's span so it'll handle that.
+		for (const node of albumArt.childNodes) {
+			if (node.nodeType === 3) {
+				if (albumArt.querySelector('.textFitted')) {
+					node.remove();
+					albumArt.querySelector('.textFitted')!.textContent = node.textContent;
+					moveCursorToEnd(albumArt);
+				}
+			}
+		}
+
 		const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 
 		textFit(albumArt, {
@@ -50,6 +71,7 @@
 		// Setting text is not triggering the resize thing
 		albumArt.textContent = texts[Math.floor(Math.random() * texts.length)];
 		resizeText();
+		moveCursorToEnd(albumArt);
 	});
 </script>
 
