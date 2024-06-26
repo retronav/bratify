@@ -51,5 +51,6 @@
 	footer {
 		position: absolute;
 		bottom: 0;
+		margin: 2rem 0;
 	}
 </style>

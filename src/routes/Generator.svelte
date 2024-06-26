@@ -5,8 +5,8 @@
 	import { texts } from '$lib/texts';
 
 	const styles = {
-		background: 'white',
-		foreground: 'black'
+		background: '#8ace00',
+		foreground: '#000000'
 	};
 
 	$: cssVariables = Object.entries(styles)
