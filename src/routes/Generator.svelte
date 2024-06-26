@@ -68,15 +68,15 @@
 <section class="settings">
 	<div>
 		<label for="background">background</label>
-		<input type="color" name="background" bind:value={styles.background} />
+		<input type="color" id="background" bind:value={styles.background} />
 	</div>
 	<div>
 		<label for="foreground">text</label>
-		<input type="color" name="foreground" bind:value={styles.foreground} />
+		<input type="color" id="foreground" bind:value={styles.foreground} />
 	</div>
 	<div>
-		<label for="checkbox">Center text but might not work well with long text</label>
-		<input type="checkbox" name="center" bind:checked={centeredText} />
+		<label for="center">Center text but might not work well with long text</label>
+		<input type="checkbox" id="center" bind:checked={centeredText} />
 	</div>
 </section>
 

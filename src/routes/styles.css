@@ -1,6 +1,7 @@
 @font-face {
 	font-family: arialnarrow;
-	src: url("../lib/fonts/arial-narrow.woff");
+	src: url('../lib/fonts/arial-narrow.woff');
+	font-display: swap;
 }
 
 body {
