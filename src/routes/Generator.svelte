@@ -103,7 +103,7 @@
 </section>
 
 <section class="export">
-	<button data-umami-event="Export" on:click={exportArt}>export</button>
+	<button data-umami-event="Export" on:click={exportArt}>download</button>
 </section>
 
 <style>
