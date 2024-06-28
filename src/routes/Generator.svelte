@@ -56,7 +56,7 @@
 		blurredCanvas.width = canvas.width;
 		blurredCanvas.height = canvas.height;
 		const tempCtx = blurredCanvas.getContext('2d')!;
-		tempCtx.filter = 'blur(1px) contrast(1.25)';
+		tempCtx.filter = 'blur(2px) contrast(1.25)';
 		tempCtx.drawImage(canvas, 0, 0);
 
 		const image = blurredCanvas.toDataURL('image/png');
@@ -118,7 +118,7 @@
 		height: 24rem;
 		text-align: justify;
 		backface-visibility: hidden;
-		filter: blur(1px) contrast(1.25);
+		filter: blur(2px) contrast(1.25);
 	}
 	.album-art.centered {
 		display: flex;
