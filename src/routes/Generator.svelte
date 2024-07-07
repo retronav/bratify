@@ -3,6 +3,7 @@
 	import textFit from 'textfit';
 	import html2canvas from 'html2canvas';
 	import { texts } from '$lib/texts';
+	import { Image } from 'image-js';
 
 	const styles = {
 		background: '#8ace00',
@@ -52,24 +53,25 @@
 	async function exportArt() {
 		const canvas = await html2canvas(albumArt);
 
-		const blurredCanvas = document.createElement('canvas');
-		blurredCanvas.width = canvas.width;
-		blurredCanvas.height = canvas.height;
-		const tempCtx = blurredCanvas.getContext('2d')!;
-		tempCtx.filter = 'blur(2px) contrast(1.25)';
-		tempCtx.drawImage(canvas, 0, 0);
+		let image = await Image.load(canvas.toDataURL('image/jpeg'));
+		const originalWidth = image.width;
+		image = image
+			.resize({ preserveAspectRatio: true, width: originalWidth * 0.85 }) // Get those compression artifacts like the original cover
+			.resize({ preserveAspectRatio: true, width: originalWidth })
+			.blurFilter({ radius: 2 });
 
-		const image = blurredCanvas.toDataURL('image/png');
 		const link = document.createElement('a');
-		link.href = image;
-		link.download = `${text}.png`;
+		link.href = image.toDataURL();
+
+		link.download = `${text}.jpeg`;
 		link.click();
 	}
 
 	onMount(() => {
 		albumArt.focus();
-		// Setting text is not triggering the resize thing
-		albumArt.textContent = texts[Math.floor(Math.random() * texts.length)];
+		// Setting just text is not triggering the resize thing
+		text = texts[Math.floor(Math.random() * texts.length)];
+		albumArt.textContent = text;
 		resizeText();
 		moveCursorToEnd(albumArt);
 	});

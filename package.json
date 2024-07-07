@@ -33,6 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"html2canvas": "^1.4.1",
+		"image-js": "^0.35.6",
 		"textfit": "^2.4.0"
 	}
 }
