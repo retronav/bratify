@@ -1,5 +1,6 @@
 <script>
 	import './styles.css';
+	import Umami from './Umami.svelte';
 </script>
 
 <div class="app">
@@ -7,3 +8,4 @@
 		<slot />
 	</main>
 </div>
+<Umami />
