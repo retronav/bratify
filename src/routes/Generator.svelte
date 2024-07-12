@@ -3,18 +3,19 @@
 	import textFit from 'textfit';
 	import html2canvas from 'html2canvas';
 	import { texts } from '$lib/texts';
-	import { Image } from 'image-js';
+	import { albumColors } from '$lib/colors';
 
-	const styles = {
-		background: '#8ace00',
-		foreground: '#000000'
+	let text: string = 'brat';
+	let colorPreset = 'brat';
+
+	let styles = {
+		background: albumColors[colorPreset].background,
+		foreground: albumColors[colorPreset].foreground
 	};
 
 	$: cssVariables = Object.entries(styles)
 		.map(([k, v]) => `--${k}:${v};`)
 		.join('');
-
-	let text: string = '';
 
 	let centeredText = false;
 
@@ -26,6 +27,14 @@
 			sel.selectAllChildren(element);
 			sel.collapseToEnd();
 		}
+	}
+
+	function updateStyles() {
+		if (colorPreset !== 'custom')
+			styles = {
+				background: albumColors[colorPreset].background,
+				foreground: albumColors[colorPreset].foreground
+			};
 	}
 
 	function resizeText() {
@@ -51,6 +60,7 @@
 	}
 
 	async function exportArt() {
+		const { Image } = await import('image-js');
 		const canvas = await html2canvas(albumArt);
 
 		let image = await Image.load(canvas.toDataURL('image/jpeg'));
@@ -91,16 +101,42 @@
 
 <section class="settings">
 	<div>
+		<label for="center">Center text but might not work well with long text</label>
+		<input type="checkbox" id="center" bind:checked={centeredText} />
+	</div>
+	<div>
+		<label for="preset">color presets</label>
+		<select id="preset" bind:value={colorPreset} on:change={updateStyles}>
+			{#each Object.entries(albumColors) as [name, albumColor]}
+				<option
+					style="color: {albumColor.foreground}; background-color: {albumColor.background}"
+					value={name}>{albumColor.name.toLowerCase()}</option
+				>
+			{/each}
+			<option
+				value="custom"
+				style="color: {albumColors.brat.background}; background-color: {albumColors.brat
+					.foreground}">custom color</option
+			>
+		</select>
+	</div>
+	<div>
 		<label for="background">background</label>
-		<input type="color" id="background" bind:value={styles.background} />
+		<input
+			type="color"
+			id="background"
+			bind:value={styles.background}
+			disabled={colorPreset !== 'custom'}
+		/>
 	</div>
 	<div>
 		<label for="foreground">text</label>
-		<input type="color" id="foreground" bind:value={styles.foreground} />
-	</div>
-	<div>
-		<label for="center">Center text but might not work well with long text</label>
-		<input type="checkbox" id="center" bind:checked={centeredText} />
+		<input
+			type="color"
+			id="foreground"
+			bind:value={styles.foreground}
+			disabled={colorPreset !== 'custom'}
+		/>
 	</div>
 </section>
 
