@@ -63,7 +63,7 @@
 	}
 
 	footer {
-		position: absolute;
+		position: relative;
 		bottom: 0;
 		margin: 2rem 0;
 	}
