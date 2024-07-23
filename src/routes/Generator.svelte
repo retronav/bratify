@@ -75,7 +75,7 @@
 		class:centered={centeredText}
 		bind:this={albumArt}
 		use:textfit={{
-			update: text,
+			update: [text, styles],
 			parent: albumArt,
 			max: 6 * rem
 		}}
