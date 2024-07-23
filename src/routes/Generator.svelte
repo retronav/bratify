@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import textFit from 'textfit';
 	import html2canvas from 'html2canvas';
 	import { texts } from '$lib/texts';
 	import { albumColors } from '$lib/colors';
+	import { textfit } from 'svelte-textfit';
 
 	let text: string = 'brat';
 	let colorPreset = 'brat';
@@ -17,6 +17,7 @@
 		.map(([k, v]) => `--${k}:${v};`)
 		.join('');
 
+	let rem = 16;
 	let centeredText = false;
 
 	let albumArt!: HTMLDivElement;
@@ -35,28 +36,6 @@
 				background: albumColors[colorPreset].background,
 				foreground: albumColors[colorPreset].foreground
 			};
-	}
-
-	function resizeText() {
-		// Weird edge case where if center mode is selected and user removes all
-		// existing text, the new entered text is not resized. Move it to
-		// textFit's span so it'll handle that.
-		for (const node of albumArt.childNodes) {
-			if (node.nodeType === 3) {
-				if (albumArt.querySelector('.textFitted')) {
-					node.remove();
-					albumArt.querySelector('.textFitted')!.textContent = node.textContent;
-					moveCursorToEnd(albumArt);
-				}
-			}
-		}
-
-		const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-
-		textFit(albumArt, {
-			maxFontSize: 6 * rem,
-			multiLine: true
-		});
 	}
 
 	async function exportArt() {
@@ -78,24 +57,28 @@
 	}
 
 	onMount(() => {
+		rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 		albumArt.focus();
 		// Setting just text is not triggering the resize thing
 		text = texts[Math.floor(Math.random() * texts.length)];
 		albumArt.textContent = text;
-		resizeText();
 		moveCursorToEnd(albumArt);
 	});
 </script>
 
 <section class="shadow">
 	<div
-		contenteditable="plaintext-only"
+		contenteditable="true"
 		bind:textContent={text}
-		on:input={resizeText}
 		style={cssVariables}
 		class="album-art"
 		class:centered={centeredText}
 		bind:this={albumArt}
+		use:textfit={{
+			update: text,
+			parent: albumArt,
+			max: 6 * rem
+		}}
 	></div>
 </section>
 
@@ -160,6 +143,8 @@
 	}
 	.album-art.centered {
 		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
