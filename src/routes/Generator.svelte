@@ -47,7 +47,7 @@
 		image = image
 			.resize({ preserveAspectRatio: true, width: originalWidth * 0.85 }) // Get those compression artifacts like the original cover
 			.resize({ preserveAspectRatio: true, width: originalWidth })
-			.blurFilter({ radius: 3 });
+			.blurFilter({ radius: 2 });
 
 		return image;
 	}
