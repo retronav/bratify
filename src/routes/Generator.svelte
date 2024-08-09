@@ -38,22 +38,41 @@
 			};
 	}
 
-	async function exportArt() {
+	async function renderArt() {
 		const { Image } = await import('image-js');
 		const canvas = await html2canvas(albumArt);
 
-		let image = await Image.load(canvas.toDataURL('image/jpeg'));
+		let image = await Image.load(canvas.toDataURL('image/png'));
 		const originalWidth = image.width;
 		image = image
 			.resize({ preserveAspectRatio: true, width: originalWidth * 0.85 }) // Get those compression artifacts like the original cover
 			.resize({ preserveAspectRatio: true, width: originalWidth })
 			.blurFilter({ radius: 2 });
 
+		return image;
+	}
+
+	async function downloadArt() {
+		const image = await renderArt();
+
 		const link = document.createElement('a');
 		link.href = image.toDataURL();
 
-		link.download = `${text}.jpeg`;
+		link.download = `${text}.png`;
 		link.click();
+	}
+
+	async function copyArtToClipboard() {
+		const image = await renderArt();
+		const blob = await image.toBlob('image/png', 1.0);
+
+		const item = new ClipboardItem({
+			'image/png': blob
+		});
+
+		await navigator.clipboard.write([item]);
+
+		alert('Copied image to clipboard');
 	}
 
 	onMount(() => {
@@ -124,7 +143,8 @@
 </section>
 
 <section class="export">
-	<button data-umami-event="Export" on:click={exportArt}>download</button>
+	<button data-umami-event="Export" on:click={downloadArt}>download</button>
+	<button data-umami-event="Export" on:click={copyArtToClipboard}>copy to clipboard</button>
 </section>
 
 <style>
