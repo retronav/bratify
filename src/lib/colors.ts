@@ -11,6 +11,7 @@ export const albumColors: Record<string, AlbumColor> = {
 	howimfeelingnow: { name: "how i'm feeling now", background: '#ffffff', foreground: '#c1c1c1' },
 	charli: { name: 'Charli', background: '#918a84', foreground: '#000000' },
 	pop2: { name: 'Pop 2', background: '#c9a1dd', foreground: '#000000' },
+	vroomvroom: { name: 'Vroom Vroom', background: '#000000', foreground: '#404040' },
 	number1angel: { name: 'Number 1 Angel', background: '#d20001', foreground: '#ff1000' },
 	sucker: { name: 'SUCKER', background: '#f5abcc', foreground: '#ffffff' },
 	trueromance: { name: 'True Romance', background: '#700150', foreground: '#ffffff' }
