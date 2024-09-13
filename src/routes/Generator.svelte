@@ -19,6 +19,7 @@
 
 	let rem = 16;
 	let centeredText = false;
+	let mirroredText = false;
 
 	let albumArt!: HTMLDivElement;
 
@@ -92,6 +93,7 @@
 		style={cssVariables}
 		class="album-art"
 		class:centered={centeredText}
+		class:mirrored={mirroredText}
 		bind:this={albumArt}
 		use:textfit={{
 			update: [text, styles],
@@ -105,6 +107,8 @@
 	<div>
 		<label for="center">Center text but might not work well with long text</label>
 		<input type="checkbox" id="center" bind:checked={centeredText} />
+		<label for="mirror">Mirror text</label>
+		<input type="checkbox" id="mirror" bind:checked={mirroredText} />
 	</div>
 	<div>
 		<label for="preset">color presets</label>
@@ -159,7 +163,7 @@
 		height: 24rem;
 		text-align: justify;
 		backface-visibility: hidden;
-		filter: blur(2px) contrast(1.25);
+		filter: blur(2px);
 	}
 	.album-art.centered {
 		display: flex;
@@ -168,6 +172,9 @@
 		align-items: center;
 		justify-content: center;
 		text-align: center;
+	}
+	.album-art.mirrored {
+		transform: scaleX(-1);
 	}
 	.album-art:focus {
 		outline: none;
