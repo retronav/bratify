@@ -11,30 +11,34 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.3.1",
-		"@sveltejs/adapter-vercel": "^5.7.0",
-		"@sveltejs/kit": "^2.20.5",
-		"@sveltejs/vite-plugin-svelte": "^3.1.2",
-		"@types/eslint": "^8.56.12",
+		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/adapter-vercel": "^5.7.1",
+		"@sveltejs/kit": "^2.20.8",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@types/eslint": "^9.6.1",
 		"@types/textfit": "^2.4.5",
-		"eslint": "^9.24.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.46.1",
-		"globals": "^15.15.0",
+		"eslint": "^9.26.0",
+		"eslint-config-prettier": "^10.1.2",
+		"eslint-plugin-svelte": "^3.5.1",
+		"globals": "^16.0.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.3.3",
-		"svelte": "^4.2.19",
-		"svelte-check": "^3.8.6",
+		"svelte": "^5.28.2",
+		"svelte-check": "^4.1.7",
 		"svelte-textfit": "^1.1.4",
 		"tslib": "^2.8.1",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.29.1",
-		"vite": "^5.4.18"
+		"typescript-eslint": "^8.31.1",
+		"vite": "^6.3.4"
 	},
 	"type": "module",
 	"dependencies": {
 		"html2canvas": "^1.4.1",
-		"image-js": "^0.35.6",
-		"roughjs": "^4.6.6"
+		"image-js": "^0.37.0"
+	},
+	"overrides": {
+		"svelte-textfit": {
+			"svelte": "^5.28.2"
+		}
 	}
 }
