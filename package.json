@@ -34,6 +34,7 @@
 	"type": "module",
 	"dependencies": {
 		"html2canvas": "^1.4.1",
-		"image-js": "^0.35.6"
+		"image-js": "^0.35.6",
+		"roughjs": "^4.6.6"
 	}
 }

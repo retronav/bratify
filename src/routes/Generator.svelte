@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import html2canvas from 'html2canvas';
-	import { texts } from '$lib/texts';
 	import { albumColors } from '$lib/colors';
+	import { texts } from '$lib/texts';
+	import html2canvas from 'html2canvas';
+	import { onMount } from 'svelte';
 	import { textfit } from 'svelte-textfit';
+	import Scribble from './Scribble.svelte';
 
 	let text: string = 'brat';
 	let colorPreset = 'brat';
@@ -20,8 +21,13 @@
 	let rem = 16;
 	let centeredText = false;
 	let mirroredText = false;
+	let scribbledText = false;
+
+	// can only scribble when centered
+	$: scribbledText = centeredText ? scribbledText : false;
 
 	let albumArt!: HTMLDivElement;
+	let scribble!: HTMLDivElement;
 
 	function moveCursorToEnd(element: HTMLElement) {
 		const sel = window.getSelection();
@@ -41,7 +47,9 @@
 
 	async function renderArt() {
 		const { Image } = await import('image-js');
-		const canvas = await html2canvas(albumArt);
+		const canvas = await html2canvas(albumArt, {
+			backgroundColor: styles.background
+		});
 
 		let image = await Image.load(canvas.toDataURL('image/png'));
 		const originalWidth = image.width;
@@ -49,6 +57,41 @@
 			.resize({ preserveAspectRatio: true, width: originalWidth * 0.85 }) // Get those compression artifacts like the original cover
 			.resize({ preserveAspectRatio: true, width: originalWidth })
 			.blurFilter({ radius: 2 });
+
+		const imageCanvas = image.getCanvas();
+		if (scribbledText) {
+			const scribbleSvg = scribble.querySelector('svg')! as SVGSVGElement;
+			const svgString = new XMLSerializer().serializeToString(scribbleSvg);
+			// load svg as image with foreground color
+			const dataUrl = `data:image/svg+xml;base64,${btoa(svgString)}`;
+
+			const scribbleImage = new window.Image(); // Use window.Image to avoid conflict with image-js Image
+
+			await new Promise((resolve, reject) => {
+				scribbleImage.onload = resolve;
+				scribbleImage.onerror = reject;
+				scribbleImage.src = dataUrl;
+			});
+
+			const ctx = imageCanvas.getContext('2d');
+			if (ctx) {
+				const canvasWidth = imageCanvas.width;
+				const canvasHeight = imageCanvas.height;
+				const svgAspectRatio =
+					scribbleSvg.viewBox.baseVal.width / scribbleSvg.viewBox.baseVal.height;
+				const drawWidth = canvasWidth;
+				const drawHeight = drawWidth / svgAspectRatio;
+				// Center the scribble vertically
+				const drawX = 0;
+				const drawY = (canvasHeight - drawHeight) / 2;
+
+				ctx.drawImage(scribbleImage, drawX, drawY, drawWidth, drawHeight);
+
+				image = Image.fromCanvas(imageCanvas);
+			} else {
+				console.error('Could not get 2D context from canvas');
+			}
+		}
 
 		return image;
 	}
@@ -87,14 +130,17 @@
 </script>
 
 <section class="shadow">
+	<div class="scribble" bind:this={scribble} class:hidden={!scribbledText}>
+		<Scribble color={styles.foreground} />
+	</div>
 	<div
 		contenteditable="true"
 		bind:textContent={text}
 		style={cssVariables}
 		class="album-art"
+		bind:this={albumArt}
 		class:centered={centeredText}
 		class:mirrored={mirroredText}
-		bind:this={albumArt}
 		use:textfit={{
 			update: [text, styles],
 			parent: albumArt,
@@ -109,6 +155,8 @@
 		<input type="checkbox" id="center" bind:checked={centeredText} />
 		<label for="mirror">Mirror text</label>
 		<input type="checkbox" id="mirror" bind:checked={mirroredText} />
+		<label for="scribble"><s>Scribble</s></label>
+		<input type="checkbox" id="scribble" disabled={!centeredText} bind:checked={scribbledText} />
 	</div>
 	<div>
 		<label for="preset">color presets</label>
@@ -155,6 +203,20 @@
 	.shadow {
 		box-shadow: 1px 0px 45px 2px rgba(0, 0, 0, 0.25);
 		margin: 2rem 0;
+		position: relative;
+	}
+	.scribble.hidden {
+		display: none;
+	}
+	.scribble {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 100%;
+		height: auto;
+		z-index: 2;
+		pointer-events: none; /* Allow clicks to pass through */
 	}
 	.album-art {
 		background-color: var(--background);

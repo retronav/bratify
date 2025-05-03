@@ -46,7 +46,8 @@
 	<footer>
 		Made by <a href="https://github.com/retronav">retronav</a> xx.
 		<a href="https://github.com/retronav/bratify">Source code</a>. Choose "custom color" in color
-		preset if your brat summer is giving a different color combo.
+		preset if your brat summer is giving a different color combo. <s>Scribbled</s> text only works when you
+		center your text first.
 	</footer>
 </section>
 
