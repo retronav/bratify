@@ -9,7 +9,7 @@
 	<title>bratify</title>
 	<meta
 		name="description"
-		content="BRAT album cover style art generator.
+		content="BRAT generator.
 	Write your text and export it as if it was a BRAT album art piece."
 	/>
 
@@ -18,7 +18,7 @@
 	<meta property="og:title" content="bratify" />
 	<meta
 		property="og:description"
-		content="BRAT album cover style art
+		content="BRAT
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
@@ -29,7 +29,7 @@
 	<meta property="twitter:title" content="bratify" />
 	<meta
 		property="twitter:description"
-		content="BRAT album cover style art
+		content="BRAT
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
@@ -46,8 +46,8 @@
 	<footer>
 		Made by <a href="https://github.com/retronav">retronav</a> xx.
 		<a href="https://github.com/retronav/bratify">Source code</a>. Choose "custom color" in color
-		preset if your brat summer is giving a different color combo. <s>Scribbled</s> text only works when you
-		center your text first.
+		preset if your brat summer is giving a different color combo. <s>Scribbled</s> text only works when
+		you center your text first.
 	</footer>
 </section>
 
