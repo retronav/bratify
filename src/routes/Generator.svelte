@@ -1,18 +1,33 @@
 <script lang="ts">
 	import { albumColors } from '$lib/colors';
 	import { texts } from '$lib/texts';
-	import html2canvas from 'html2canvas';
 	import { onMount } from 'svelte';
 	import { textfit } from 'svelte-textfit';
 	import Scribble from './Scribble.svelte';
 
 	let text: string = 'brat';
 	let colorPreset = 'brat';
+	let bgImage: File | null = null;
+
+	let albumArt!: HTMLDivElement;
+	let scribble!: HTMLDivElement;
+	let imageInput!: HTMLInputElement;
 
 	let styles = {
 		background: albumColors[colorPreset].background,
-		foreground: albumColors[colorPreset].foreground
+		foreground: albumColors[colorPreset].foreground,
+		opacity: 1
 	};
+
+	$: if (bgImage) {
+		styles.background = `url(${URL.createObjectURL(bgImage)})`;
+	}
+
+	$: if (colorPreset !== 'custom' && bgImage) {
+		// reset input
+		bgImage = null;
+		imageInput.value = '';
+	}
 
 	$: cssVariables = Object.entries(styles)
 		.map(([k, v]) => `--${k}:${v};`)
@@ -26,9 +41,6 @@
 	// can only scribble when centered
 	$: scribbledText = centeredText ? scribbledText : false;
 
-	let albumArt!: HTMLDivElement;
-	let scribble!: HTMLDivElement;
-
 	function moveCursorToEnd(element: HTMLElement) {
 		const sel = window.getSelection();
 		if (sel) {
@@ -41,59 +53,93 @@
 		if (colorPreset !== 'custom')
 			styles = {
 				background: albumColors[colorPreset].background,
-				foreground: albumColors[colorPreset].foreground
+				foreground: albumColors[colorPreset].foreground,
+				opacity: 1
 			};
 	}
 
 	async function renderArt() {
 		const { Image } = await import('image-js');
-		const canvas = await html2canvas(albumArt, {
-			backgroundColor: styles.background
+		const { default: html2canvas } = await import('html2canvas');
+
+		const capturedElementCanvas = await html2canvas(albumArt, {
+			backgroundColor: null,
+			scale: 1 // might help on retina displays doubling the resolution
 		});
 
-		let image = await Image.load(canvas.toDataURL('image/png'));
-		const originalWidth = image.width;
-		image = image
-			.resize({ preserveAspectRatio: true, width: originalWidth * 0.85 }) // Get those compression artifacts like the original cover
-			.resize({ preserveAspectRatio: true, width: originalWidth })
-			.blurFilter({ radius: 2 });
+		let processedForegroundImg = await Image.load(capturedElementCanvas.toDataURL('image/png'));
+		const rawWidth = processedForegroundImg.width;
 
-		const imageCanvas = image.getCanvas();
-		if (scribbledText) {
-			const scribbleSvg = scribble.querySelector('svg')! as SVGSVGElement;
-			const svgString = new XMLSerializer().serializeToString(scribbleSvg);
-			// load svg as image with foreground color
-			const dataUrl = `data:image/svg+xml;base64,${btoa(svgString)}`;
+		processedForegroundImg = processedForegroundImg
+			.resize({
+				preserveAspectRatio: true,
+				width: rawWidth * 0.85,
+				interpolation: 'nearestNeighbor'
+			})
+			.resize({ preserveAspectRatio: true, width: rawWidth, interpolation: 'nearestNeighbor' });
 
-			const scribbleImage = new window.Image(); // Use window.Image to avoid conflict with image-js Image
+		const compositeCanvas = document.createElement('canvas');
+		compositeCanvas.width = processedForegroundImg.width;
+		compositeCanvas.height = processedForegroundImg.height;
 
+		const compositeCtx = compositeCanvas.getContext('2d')!;
+
+		if (bgImage) {
+			const backgroundImage = new window.Image();
 			await new Promise((resolve, reject) => {
-				scribbleImage.onload = resolve;
-				scribbleImage.onerror = reject;
-				scribbleImage.src = dataUrl;
+				backgroundImage.onload = resolve;
+				backgroundImage.onerror = reject;
+				backgroundImage.src = URL.createObjectURL(bgImage!);
 			});
 
-			const ctx = imageCanvas.getContext('2d');
-			if (ctx) {
-				const canvasWidth = imageCanvas.width;
-				const canvasHeight = imageCanvas.height;
-				const svgAspectRatio =
-					scribbleSvg.viewBox.baseVal.width / scribbleSvg.viewBox.baseVal.height;
-				const drawWidth = canvasWidth;
-				const drawHeight = drawWidth / svgAspectRatio;
-				// Center the scribble vertically
-				const drawX = 0;
-				const drawY = (canvasHeight - drawHeight) / 2;
+			const targetWidth = compositeCanvas.width;
+			const targetHeight = compositeCanvas.height;
+			const sourceWidth = backgroundImage.width;
+			const sourceHeight = backgroundImage.height;
 
-				ctx.drawImage(scribbleImage, drawX, drawY, drawWidth, drawHeight);
+			const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight);
 
-				image = Image.fromCanvas(imageCanvas);
-			} else {
-				console.error('Could not get 2D context from canvas');
-			}
+			const scaledWidth = sourceWidth * scale;
+			const scaledHeight = sourceHeight * scale;
+
+			const offsetX = (targetWidth - scaledWidth) / 2;
+			const offsetY = (targetHeight - scaledHeight) / 2;
+
+			compositeCtx.filter = 'brightness(0.8)';
+			compositeCtx.drawImage(backgroundImage, offsetX, offsetY, scaledWidth, scaledHeight);
+			compositeCtx.filter = 'none';
+		} else {
+			compositeCtx.fillStyle = styles.background;
+			compositeCtx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
 		}
 
-		return image;
+		const foregroundCanvas = processedForegroundImg.getCanvas();
+
+		compositeCtx.filter = 'blur(1px)';
+		compositeCtx.drawImage(foregroundCanvas, 0, 0);
+		compositeCtx.filter = 'none';
+
+		if (scribbledText) {
+			const scribbleSvg = scribble.querySelector('svg')! as SVGSVGElement;
+			const svgXml = new XMLSerializer().serializeToString(scribbleSvg);
+			const svgDataUrl = `data:image/svg+xml;base64,${btoa(svgXml)}`;
+
+			const scribbleOverlay = new window.Image();
+			await new Promise((resolve, reject) => {
+				scribbleOverlay.onload = resolve;
+				scribbleOverlay.onerror = reject;
+				scribbleOverlay.src = svgDataUrl;
+			});
+
+			const drawWidth = foregroundCanvas.width;
+			const aspectRatio = scribbleSvg.viewBox.baseVal.width / scribbleSvg.viewBox.baseVal.height;
+			const drawHeight = drawWidth / aspectRatio;
+			const drawY = (foregroundCanvas.height - drawHeight) / 2;
+
+			compositeCtx.drawImage(scribbleOverlay, 0, drawY, drawWidth, drawHeight);
+		}
+
+		return Image.fromCanvas(compositeCanvas);
 	}
 
 	async function downloadArt() {
@@ -119,6 +165,18 @@
 		alert('Copied image to clipboard');
 	}
 
+	function onImageUpload(event: Event) {
+		const input = event.target as HTMLInputElement;
+		if (input.files && input.files[0]) {
+			// Switch to custom for better control of color
+			colorPreset = 'custom';
+
+			bgImage = input.files[0];
+		} else {
+			bgImage = null;
+		}
+	}
+
 	onMount(() => {
 		rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 		albumArt.focus();
@@ -133,6 +191,7 @@
 	<div class="scribble" bind:this={scribble} class:hidden={!scribbledText}>
 		<Scribble color={styles.foreground} />
 	</div>
+	<div class="background" class:dimmed={!!bgImage} style={cssVariables}></div>
 	<div
 		contenteditable="true"
 		bind:textContent={text}
@@ -180,7 +239,7 @@
 			type="color"
 			id="background"
 			bind:value={styles.background}
-			disabled={colorPreset !== 'custom'}
+			disabled={colorPreset !== 'custom' || !!bgImage}
 		/>
 	</div>
 	<div>
@@ -190,6 +249,28 @@
 			id="foreground"
 			bind:value={styles.foreground}
 			disabled={colorPreset !== 'custom'}
+		/>
+	</div>
+	<div>
+		<label for="opacity">text fade</label>
+		<input type="range" id="opacity" min="0" max="1" step="0.01" bind:value={styles.opacity} />
+		<input
+			type="number"
+			aria-labelledby="opacity"
+			min="0"
+			max="1"
+			step="0.01"
+			bind:value={styles.opacity}
+		/>
+	</div>
+	<div>
+		<label for="image">background image</label>
+		<input
+			type="file"
+			id="image"
+			accept="image/*"
+			on:change={onImageUpload}
+			bind:this={imageInput}
 		/>
 	</div>
 </section>
@@ -218,14 +299,32 @@
 		z-index: 2;
 		pointer-events: none; /* Allow clicks to pass through */
 	}
+	.background {
+		background: var(--background);
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+
+		&.dimmed {
+			filter: brightness(0.8);
+		}
+	}
 	.album-art {
-		background-color: var(--background);
 		color: var(--foreground);
+		opacity: var(--opacity);
 		width: 24rem;
 		height: 24rem;
 		text-align: justify;
 		backface-visibility: hidden;
-		filter: blur(2px);
+		filter: blur(1.5px);
+		position: relative;
+		z-index: 2;
 	}
 	.album-art.centered {
 		display: flex;
@@ -243,12 +342,16 @@
 	}
 	.settings {
 		display: flex;
+		flex-wrap: wrap;
 		flex-direction: row;
 		gap: 1rem;
-		margin: 2rem 0;
+		margin: 2rem;
+
+		label[for='opacity'] {
+			color: #000000cc;
+		}
 	}
 	.settings div {
-		width: 100%;
 		display: flex;
 		align-items: center;
 		gap: 1rem;
@@ -258,10 +361,15 @@
 		font-size: 1.5rem;
 	}
 
+	input[type='range'] {
+		accent-color: black;
+	}
+
 	@media (max-width: 768px) {
 		.settings {
 			display: flex;
 			flex-direction: column;
+			margin: 2rem 0;
 		}
 		.settings div {
 			justify-content: space-between;

@@ -22,7 +22,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="og:image" content={`https://${data.url ?? ''}/bratify.jpeg`} />
+	<meta property="og:image" content={`https://${data.url ?? ''}/bratify.png`} />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
@@ -33,7 +33,7 @@
 	generator. Write your text and export it as if it was a BRAT album art
 	piece."
 	/>
-	<meta property="twitter:image" content={`https://${data.url ?? ''}/bratify.jpeg`} />
+	<meta property="twitter:image" content={`https://${data.url ?? ''}/bratify.png`} />
 </svelte:head>
 
 <section>
@@ -46,8 +46,10 @@
 	<footer>
 		Made by <a href="https://karawale.in">retronav</a> xx.
 		<a href="https://github.com/retronav/bratify">Source code</a>. Choose "custom color" in color
-		preset if your brat summer is giving a different color combo. <s>Scribbled</s> text only works when
-		you center your text first.
+		preset if your brat summer is giving a different color combo.
+		<br />
+		<s>Scribbled</s> text only works when you center your text first. You can also set the background
+		an image instead of a color!
 	</footer>
 </section>
 
@@ -61,11 +63,12 @@
 
 	h1 {
 		width: 100%;
+		font-size: 2em;
 	}
 
 	footer {
 		position: relative;
 		bottom: 0;
-		margin: 2rem 0;
+		margin: 1rem 0;
 	}
 </style>
